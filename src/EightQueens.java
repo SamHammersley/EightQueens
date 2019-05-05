@@ -36,31 +36,64 @@ public class EightQueens {
         }
         
     }
+	
+	private static int[] readBoard(String[] args) {
+		int[] board = new int[args.length];
+		
+		for (int index = 0; index < args.length; index++) {
+			board[index] = Integer.parseInt(args[index]);
+		}
+		
+		return board;
+	}
     
     public static void main(String[] args) {
-        heapPermutation(new int[]{1, 2, 3, 4, 5, 6, 7, 8}, 8);
-    
-        for (int[] perm : permutations) {
-            List<Position> positions = new ArrayList<>();
-            
-            for (int index = 1; index <= perm.length; index++) {
-                Position position = new Position(index, perm[index - 1]);
-                
-                if (position.isSusceptible(positions)) {
-                    positions = null;
-                    break;
-                    
-                } else {
-                    positions.add(position);
-                }
+	    heapPermutation(new int[]{1, 2, 3, 4, 5, 6, 7, 8}, 8);
+	
+	    int boardCount = Integer.parseInt(args[0]);
+	
+	    if (args.length < boardCount * 64 + 1) {
+		    throw new RuntimeException("Mismatched board counts");
+	    }
+	
+	    for (int b = 0; b < boardCount; b++) {
+		    int boardTotal = 0;
+		    int[] board = readBoard(Arrays.copyOfRange(args, b * 64 + 1, 64 + b * 64 + 1));
+		
+		    if (board.length != 64) {
+			    throw new RuntimeException(Arrays.toString(board) + " " + (board.length) + ", from: " + (b * 64 + 1) + ", to: " + (63 + b * 64 + 1) + " Invalid board size");
+		    }
+		
+		    for (int[] perm : permutations) {
+			    List<Position> positions = new ArrayList<>();
+			    int permutationTotal = 0;
+			
+			    for (int index = 1; index <= perm.length; index++) {
+				    Position position = new Position(index, perm[index - 1]);
+				
+				    if (position.isSusceptible(positions)) {
+					    positions = null;
+					    break;
+					
+				    } else {
+					    positions.add(position);
+				    }
+			    }
+			
+			    if (positions != null) {
+				    for (Position p : positions) {
+					    int index = (p.y - 1) * 8 + (p.x - 1);
+					    permutationTotal += board[index];
+					
+					    //System.out.print(p + " " + board[index] + ",");
+				    }
+				
+				    if (permutationTotal > boardTotal) {
+					    boardTotal = permutationTotal;
+				    }
+			    }
             }
-    
-            if (positions != null) {
-                for (Position p : positions) {
-                    System.out.print(p + " ");
-                }
-                System.out.println();
-            }
+		    System.out.printf("%5s%n", boardTotal);
         }
     }
     
